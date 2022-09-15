@@ -1,15 +1,31 @@
 from multiprocessing import context
+from re import search
 from django.shortcuts import render, redirect
-
+from project.utils import searchProject
 from user.views import profile
 from .models import Project, Tags
 from . forms import ProjectForm
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def projects(request):
-    projects = Project.objects.all()
-    context = {'projects': projects}
+    projects, search_query = searchProject(request)
+
+    page = request.GET.get('page').int()
+    results = 3
+    paginator = Paginator(projects, results)
+
+    try:
+        projects = paginator.page(page)
+    except PageNotAnInteger:
+        page = 1
+        projects = paginator.page(page)
+
+
+    projects = paginator.page(page)
+
+    context = {'projects': projects, 'search_query': search_query}
     return render(request, 'project/projects.html', context)
 
 def project(request, pk):
@@ -58,3 +74,7 @@ def updateproject(request, pk):
             
     context = {'form': form, 'project': project}
     return render(request, 'project/create.html', context)
+
+
+
+
