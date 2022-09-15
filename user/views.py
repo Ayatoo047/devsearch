@@ -16,7 +16,7 @@ def usersprofile(request):
     context = {'profiles': profiles}
     return render(request, 'user/profiles.html', context)
 
-@login_required
+
 def profile(request, pk):
     profile = Profile.objects.get(id=pk)
     topskill = profile.skill_set.exclude(description__exact="")
