@@ -1,5 +1,3 @@
-from atexit import register
-from multiprocessing import context
 from django.shortcuts import redirect, render
 from .models import Profile, Skill
 from django.contrib.auth.forms import UserCreationForm
