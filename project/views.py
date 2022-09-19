@@ -12,14 +12,14 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 def projects(request):
     projects, search_query = searchProject(request)
 
-    page = request.GET.get('page').int()
+    page = request.GET.get('page')
     results = 3
     paginator = Paginator(projects, results)
 
     try:
         projects = paginator.page(page)
     except PageNotAnInteger:
-        page = 1
+        page = 2
         projects = paginator.page(page)
 
 
