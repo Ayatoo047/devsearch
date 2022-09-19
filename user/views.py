@@ -1,7 +1,7 @@
 from unicodedata import name
 from django.shortcuts import redirect, render
 
-from user.utils import searchProfile
+from user.utils import searchProfile, paginateProject
 from .models import Profile, Skill
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -15,8 +15,9 @@ from . utils import searchProfile
 
 def usersprofile(request):
     profiles, search_query = searchProfile(request)
+    custom_range, profiles = paginateProject(request, profiles, 3)
 
-    context = {'profiles': profiles, 'search_query': search_query}
+    context = {'profiles': profiles, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'user/profiles.html', context)
 
 
