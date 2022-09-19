@@ -5,22 +5,36 @@ from django.shortcuts import render, redirect
 from project.utils import paginateProject, searchProject
 from user.views import profile
 from .models import Project, Tags
-from . forms import ProjectForm
+from . forms import ProjectForm, ReviewForm
 from django.contrib.auth.decorators import login_required
 
 
 
 def projects(request):
     projects, search_query = searchProject(request)
-    custom_range, projects = paginateProject(request, projects, 3)
+    custom_range, projects = paginateProject(request, projects, 6)
 
     context = {'projects': projects, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'project/projects.html', context)
 
 def project(request, pk):
+    profile = request.user.profile
     project = Project.objects.get(id=pk)
+    form = ReviewForm()
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid:
+            review = form.save(commit=False)
+            review.project = project
+            review.owner = profile
+            review.save()
+
+            project.getVoteCount
+            return redirect(project)
+
+    
     # tags = Tags.objects.all()
-    context = {'project': project}
+    context = {'project': project, 'profile': profile, 'form': form}
     return render(request, 'project/project.html', context)
 
 def deleteproject(request, pk):
