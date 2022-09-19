@@ -1,31 +1,20 @@
 from multiprocessing import context
 from re import search
+from turtle import left, right
 from django.shortcuts import render, redirect
-from project.utils import searchProject
+from project.utils import paginateProject, searchProject
 from user.views import profile
 from .models import Project, Tags
 from . forms import ProjectForm
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 
 def projects(request):
     projects, search_query = searchProject(request)
+    custom_range, projects = paginateProject(request, projects, 3)
 
-    page = request.GET.get('page')
-    results = 3
-    paginator = Paginator(projects, results)
-
-    try:
-        projects = paginator.page(page)
-    except PageNotAnInteger:
-        page = 2
-        projects = paginator.page(page)
-
-
-    projects = paginator.page(page)
-
-    context = {'projects': projects, 'search_query': search_query}
+    context = {'projects': projects, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'project/projects.html', context)
 
 def project(request, pk):
