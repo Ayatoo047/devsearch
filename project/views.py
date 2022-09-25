@@ -17,24 +17,27 @@ def projects(request):
     context = {'projects': projects, 'search_query': search_query, 'custom_range': custom_range}
     return render(request, 'project/projects.html', context)
 
+
 def project(request, pk):
-    profile = request.user.profile
     project = Project.objects.get(id=pk)
+
     form = ReviewForm()
+
     if request.method == 'POST':
+        # profile = request.user.profile
         form = ReviewForm(request.POST)
         if form.is_valid:
             review = form.save(commit=False)
             review.project = project
-            review.owner = profile
+            review.owner = request.user.profile
             review.save()
 
             project.getVoteCount
-            return redirect(project)
+            return redirect("project")
 
     
     # tags = Tags.objects.all()
-    context = {'project': project, 'profile': profile, 'form': form}
+    context = {'project': project, 'form': form}
     return render(request, 'project/project.html', context)
 
 def deleteproject(request, pk):
