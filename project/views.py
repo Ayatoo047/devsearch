@@ -33,7 +33,7 @@ def project(request, pk):
             review.save()
 
             project.getVoteCount
-            return redirect("project")
+            return redirect("project", pk=project.id)
 
     
     # tags = Tags.objects.all()

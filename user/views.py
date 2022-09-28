@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .form import CustomUSerForm, SkillForm
+from .form import CustomUSerForm, SkillForm, ProfileForm
 from . utils import searchProfile
 
 # Create your views here.
@@ -52,7 +52,7 @@ def loginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('home')
+            return redirect(request.GET['next'] if 'next' in request.GET else 'account')
 
         else:
             print('something went wrong')
@@ -75,7 +75,7 @@ def registeruser(request):
             user.username = user.username.lower()
             user.save()
         
-            return redirect('home')
+            return redirect('editprofile')
           
     context = {'form': form}
     return render(request, 'user/login-register.html', context)
@@ -87,6 +87,22 @@ def account(request):
 
     context = {'profile': profile}
     return render(request, 'user/account.html', context)
+
+
+@login_required(login_url='login')
+def editAccount(request):
+    profile = request.user.profile
+    form = ProfileForm(instance=profile)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+
+            return redirect('account')
+
+    context = {'form': form}
+    return render(request, 'user/profile_form.html', context)
 
 
 @login_required
