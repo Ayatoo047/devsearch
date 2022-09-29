@@ -2,10 +2,10 @@ from unicodedata import name
 from django.shortcuts import redirect, render
 
 from user.utils import searchProfile, paginateProject
-from .models import Profile, Skill
-from django.contrib.auth.forms import UserCreationForm
+from .models import Profile
+# from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.db.models import Q
+# from django.db.models import Q
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .form import CustomUSerForm, SkillForm, ProfileForm
@@ -38,7 +38,7 @@ def loginPage(request):
         return redirect('home')
 
     if request.method == "POST":
-        username = request.POST['username']
+        username = request.POST['username'].lower()
         password = request.POST['password']
 
         try:
