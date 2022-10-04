@@ -8,7 +8,7 @@
           <div class="card text-center">
             <div class="card__body dev">
               <a class="tag tag--pill tag--main settings__btn" href="{% url 'editprofile' %}"><i class="im im-edit"></i> Edit</a>
-              <img class="avatar avatar--xl dev__avatar" src="https://avatars.githubusercontent.com/u/33843378" />
+              <img class="avatar avatar--xl dev__avatar" src="{{profile.profile_image.url}}" />
               <h2 class="dev__name">{{profile.name}}</h2>
               <p class="dev__title">{{profile.short_intro}}</p>
               <p class="dev__location">Based in {{profile.location}}</p>
@@ -29,7 +29,9 @@
                   <a title="Personal Website" href="#" target="_blank"><i class="im im-globe"></i></a>
                 </li>
               </ul>
-              <a href="#" class="btn btn--sub btn--lg">Send Message </a>
+              {% if request.user.profile.id != profile.id %}
+              <a href="{% url 'createmessage' profile.id %}" class="btn btn--sub btn--lg">Send Message </a>
+              {% endif %}
             </div>
           </div>
         </div>

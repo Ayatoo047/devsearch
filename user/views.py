@@ -1,14 +1,17 @@
+from contextvars import Context
+import email
+from pyexpat.errors import messages
 from unicodedata import name
 from django.shortcuts import redirect, render
 
 from user.utils import searchProfile, paginateProject
-from .models import Profile
+from .models import Message, Profile
 # from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 # from django.db.models import Q
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .form import CustomUSerForm, SkillForm, ProfileForm
+from .form import CustomUSerForm, MessageForm, SkillForm, ProfileForm
 from . utils import searchProfile
 
 # Create your views here.
@@ -143,3 +146,50 @@ def deleteSkill(request, pk):
 
     context = {"obj": skill}
     return render(request, 'project/delete.html', context)
+
+
+def inbox(request):
+    profile = request.user.profile
+    userinbox = profile.messages.all()
+    unreadNumber = userinbox.filter(is_read=False).count()
+    context = {'userinbox': userinbox, 'unreadNumber': unreadNumber}
+    return render(request, 'user/inbox.html', context)
+
+
+def dm(request, pk):
+    profile = request.user.profile
+    message = profile.messages.get(id=pk)
+    if message.is_read == False:
+        message.is_read = True
+        message.save()
+
+    context = {'message': message, 'profile': profile}
+    return render(request, 'user/message.html', context)
+
+
+def createMessage(request, pk):
+    recepient = Profile.objects.get(id=pk)
+    form = MessageForm()
+
+    try:
+        sender = request.user.profile
+    except:
+        sender = None
+
+    if request.method == "POST":
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = sender
+            message.receiver = recepient
+
+            if sender:
+                message.name = sender.name
+                message.email = sender.email
+            message.save()
+            return redirect('profile', pk=recepient.id)
+            
+        
+    context = {"recepient": recepient, 'form': form}
+    return render(request, 'user/messageform.html', context)
+
