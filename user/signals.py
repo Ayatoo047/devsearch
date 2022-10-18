@@ -1,5 +1,5 @@
 import email
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.contrib.auth.models import User
 from .models import Profile
 
@@ -15,4 +15,10 @@ def profileupdate(sender, created, instance, **kwarg):
         print('profile created')
         
 
+def deleteprofile(sender, created, instance, **kwarg):
+    user = instance.user
+    user.delete()
+
+
 post_save.connect(profileupdate, sender=User)
+post_delete.connect(deleteprofile, sender=Profile)
